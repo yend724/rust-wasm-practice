@@ -18,6 +18,15 @@ pub enum Cell {
     Alive = 1,
 }
 
+impl Cell {
+    fn toggle(&mut self) {
+        *self = match *self {
+            Cell::Dead => Cell::Alive,
+            Cell::Alive => Cell::Dead,
+        };
+    }
+}
+
 #[wasm_bindgen]
 pub struct Universe {
     width: u32,
@@ -73,13 +82,13 @@ impl Universe {
                 let cell = self.cells[idx];
                 let live_neighbors = self.live_neighbor_count(row, col);
 
-                log!(
-                    "セル[{}, {}]の初期状態は{:?}で、生存している隣接セルは{}個です",
-                    row,
-                    col,
-                    cell,
-                    live_neighbors
-                );
+                // log!(
+                //     "セル[{}, {}]の初期状態は{:?}で、生存している隣接セルは{}個です",
+                //     row,
+                //     col,
+                //     cell,
+                //     live_neighbors
+                // );
 
                 let next_cell = match (cell, live_neighbors) {
                     // Rule 1: Any live cell with fewer than two live neighbours
@@ -98,7 +107,7 @@ impl Universe {
                     (otherwise, _) => otherwise,
                 };
 
-                log!("    it becomes {:?}", next_cell);
+                // log!("    it becomes {:?}", next_cell);
 
                 next[idx] = next_cell;
             }
@@ -145,6 +154,11 @@ impl Universe {
     // 状態をテキストとして表現するメソッド
     pub fn render(&self) -> String {
         self.to_string()
+    }
+
+    pub fn toggle_cell(&mut self, row: u32, column: u32) {
+        let idx = self.get_index(row, column);
+        self.cells[idx].toggle();
     }
 
     /// Set the width of the universe.
